@@ -43,12 +43,12 @@ INSTALLED_APPS = [
     'priceapp',
     'django.contrib.sites',
     'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
     'django_celery_beat',
     'django_celery_results'
     # 'allauth.socialaccount.providers.google',
 ]
+
+AUTH_PASSWORD_VALIDATORS = []
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

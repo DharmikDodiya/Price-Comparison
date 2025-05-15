@@ -12,9 +12,9 @@ app.autodiscover_tasks()
 
 # Celery Beat schedule (every 10 seconds)
 app.conf.beat_schedule = {
-    'check-price-drops-every-10-seconds': {
+    'check-price-drops-every-hour': {
         'task': 'priceapp.tasks.check_price_drops',
-        'schedule': 10.0,  # Run every 10 seconds
+        'schedule': crontab(minute=0),  # Run every hour at minute 0
     },
 }
 

@@ -1,0 +1,177 @@
+<!-- priceapp/templates/priceapp/search.html -->
+{% comment %} {% extends 'priceapp/base.html' %} {% endcomment %}
+
+{% comment %} {% block content %}
+<h2>Search Results for "{{ name }}"</h2>
+
+{% if flipkart or reliance %}
+    <ul class="list-group">
+        {% if flipkart %}
+            <li class="list-group-item">
+                <strong>Flipkart:</strong> ₹{{ flipkart.price }} - <a href="{{ flipkart.url }}" target="_blank">View Product</a>
+            </li>
+        {% endif %}
+        {% if reliance %}
+            <li class="list-group-item">
+                <strong>Reliance Digital:</strong> ₹{{ reliance.price }} - <a href="{{ reliance.url }}" target="_blank">View Product</a>
+            </li>
+        {% endif %}
+    </ul>
+{% else %}
+    <p>No results found for "{{ name }}". Please try a different search.</p>
+{% endif %}
+
+<a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+{% endblock %} {% endcomment %}
+
+{% comment %} <form method="post" action="{% url 'search' %}">
+    {% csrf_token %}
+    <input type="text" name="search" placeholder="Search for products..." required>
+    <button type="submit">Start Comparing</button>
+</form> {% endcomment %}
+
+
+{% comment %} {% extends 'priceapp/base.html' %} {% endcomment %}
+
+{% comment %} {% block content %}
+<h2>Search Results for "{{ name }}"</h2>
+
+{% if amazon or flipkart or reliance %}
+    <ul class="list-group">
+        {% if amazon %}
+            <li class="list-group-item">
+                <strong>Amazon:</strong> ₹{{ amazon.price }} - <a href="{{ amazon.url }}" target="_blank">View Product</a>
+            </li>
+        {% endif %}
+        {% if flipkart %}
+            <li class="list-group-item">
+                <strong>Flipkart:</strong> ₹{{ flipkart.price }} - <a href="{{ flipkart.url }}" target="_blank">View Product</a>
+            </li>
+        {% endif %}
+        {% if reliance %}
+            <li class="list-group-item">
+                <strong>Reliance Digital:</strong> ₹{{ reliance.price }} - <a href="{{ reliance.url }}" target="_blank">View Product</a>
+            </li>
+        {% endif %}
+    </ul>
+{% else %}
+    <p>No results found for "{{ name }}". Please try a different search.</p>
+{% endif %}
+
+<a href="{% url 'home' %}" class="btn btn-secondary mt-3">Back to Home</a>
+{% endblock %}
+
+<form method="post" action="{% url 'search' %}">
+    {% csrf_token %}
+    <input type="text" name="search" placeholder="Search for products..." required>
+    <button type="submit">Start Comparing</button>
+</form> {% endcomment %}
+
+
+{% comment %} {% extends 'priceapp/base.html' %} {% endcomment %}
+
+
+
+
+
+{% comment %} {% block content %}
+<div class="container">
+    <div class="card shadow-sm p-4 bg-white">
+        <form method="post">
+            {% csrf_token %}
+            <label for="search">Enter Your Search</label>
+            <input type="search" class="form-control mb-3 mt-3" name="search" placeholder="Enter Product Name">
+            <input type="submit" class="btn btn-primary">
+        </form>
+    </div>
+
+    {% if flipkart or amazon %}
+    <div class="row mt-5">
+        <!-- Flipkart Box -->
+        <div class="col-md-6">
+            <div class="card p-3 shadow">
+                <h4>Flipkart</h4>
+                {% if flipkart %}
+                    {% if flipkart.image_url %}
+                        <img src="{{ flipkart.image_url }}" alt="Flipkart Product Image" class="img-fluid" style="height: 100px;width: 100px;">
+                    {% endif %}
+                    <p><strong>Product Name:</strong> {{ name }}</p>
+                    <p><strong>Price:</strong> {{ flipkart.price }}</p>
+                    <p><strong>Specifications:</strong></p>
+                    <ul>
+                        {% for spec in flipkart.specifications %}
+                            <li>{{ spec }}</li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{{ flipkart.url }}" class="btn btn-primary" target="_blank">Buy on Flipkart</a>
+                {% else %}
+                    <p>No results found on Flipkart.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Amazon (or another e-commerce) Box -->
+        <div class="col-md-6">
+            <div class="card p-3 shadow">
+                {% if amazon %}
+                <h4>{% if amazon.pname == "Flipkart" %} Gadgets 360{% elif amazon.pname == "Amazon"%}Amazon {% endif %}</h4>
+                    <img src="{{ amazon.image_url }}" alt="Reliance Product Image" class="img-fluid" height="100px" width="100px">
+                    <p><strong>Product Name:</strong> {{ amazon.name }}</p>
+                    <p><strong>Price:</strong> {{ amazon.price }}</p>
+                    <p><strong>Specifications:</strong></p>
+                    <ul>
+                        {% for spec in amazon.specifications %}
+                            <li>{{ spec }}</li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{{ amazon.url }}" class="btn btn-primary" target="_blank">Buy on Gadgets 360</a>
+                    <a href="{{ amazon.p_url }}" class="btn btn-primary mt-3" target="_blank" {% if amazon.pname == "Flipkart" %}hidden {% elif amazon.pname == "Amazon"%} {% endif %}>Buy on  Amazon</a>
+                {% else %}
+                    <p>No results found on Amazon Digital.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+ {% endcomment %}
+
+
+<h2>Search Products</h2>
+<form method="post" action="{% url 'search' %}">
+    {% csrf_token %}
+    <input type="text" name="search" placeholder="Enter product name" value="{{ search_query }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if messages %}
+<ul>
+{% for message in messages %}
+    <li style="color:red;">{{ message }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if flipkart %}
+    <h3>Flipkart</h3>
+    {% if flipkart.error %}
+        <p style="color:red;">{{ flipkart.error }}</p>
+    {% else %}
+        <a href="{{ flipkart.URL }}" target="_blank">{{ flipkart.Product_Name }}</a><br>
+        Price: {{ flipkart.Price }}<br>
+        <img src="{{ flipkart.Image_URL }}" alt="Flipkart product" width="150">
+    {% endif %}
+{% endif %}
+
+{% if amazon %}
+    <h3>Amazon</h3>
+    {% if amazon.error %}
+        <p style="color:red;">{{ amazon.error }}</p>
+    {% else %}
+        <a href="{{ amazon.URL }}" target="_blank">{{ amazon.Product_Name }}</a><br>
+        Price: {{ amazon.Price }}<br>
+        <img src="{{ amazon.Image_URL }}" alt="Amazon product" width="150">
+    {% endif %}
+{% endif %}
+ 

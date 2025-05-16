@@ -30,20 +30,15 @@
 
 ```source task_venv/bin/activate```  
 
-**Install project dependencies**
+**Run Project using Docker**
 
-```pip freeze > requirements.txt```
+```docker-compose up --build -d```
 
-**Run the following command to create the  database tables**
+- Run command for execute celery crontab
 
-```python manage.py migrate```
+```docker-compose exec django celery -A price_comparison worker --loglevel=info```
 
-**Run the project**
-
-```python3 manage.py runserver```
-
-- Your application will be served at http://127.0.0.1:8000/.
-
+```docker-compose down```
 
 # Features
 
@@ -56,6 +51,10 @@
 **Login Page**
 
 ![image](https://github.com/user-attachments/assets/6beb1575-f615-4d65-9352-ab0884ea23d6)
+
+**Register Page**
+
+![image](https://github.com/user-attachments/assets/10e9e518-f0b3-419f-a3e4-134d1c05079b)
 
 **Search Page**
 

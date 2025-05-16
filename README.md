@@ -4,8 +4,17 @@
 
 # Key Features
 
-- User registration and login.
-- Scraping data from Amazon, Flipkart.
+- User Authentication: Secure user registration and login.
+
+- Real-Time Price Scraping: Automated data collection from popular e-commerce sites like Amazon, Flipkart, and others.
+
+- Price Drop Alerts: Real-time notifications for price changes using Celery for background processing.
+
+- Scalable Architecture: Efficient, containerized deployment using Docker and PostgreSQL for data storage.
+
+**In the backend, use Celery to scrape product data from Amazon and Flipkart every hour, updating the latest prices and maintaining a price history and send price is less than last price than send notification to user.**
+
+**Send a notification for every new user login with welcome message.**
 
 # Installation Guide
 
@@ -30,6 +39,8 @@
 
 ```source myenv/bin/activate```  
 
+**Setup your.env file**
+
 **Run Project using Docker**
 
 ```docker-compose up --build -d```
@@ -40,13 +51,7 @@
 
 ```docker-compose down```
 
-# Features
-
-- Basic User Authentication registration , login, logout, 
-- Basic navigation (home page, login, register)
-- Compare product prices from different websites
-
-**In the backend, use Celery to scrape product data from Amazon and Flipkart every hour, updating the latest prices and maintaining a price history.**
+# Images
 
 **Login Page**
 

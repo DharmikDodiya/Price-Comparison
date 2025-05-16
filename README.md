@@ -28,7 +28,7 @@
 
 ```python3 -m venv myenv```
 
-```source task_venv/bin/activate```  
+```source myenv/bin/activate```  
 
 **Run Project using Docker**
 

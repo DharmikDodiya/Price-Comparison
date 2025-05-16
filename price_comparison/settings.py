@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -82,40 +80,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'price_comparison.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('POSTGRES_DB', default='price_comparison'),
         'USER': os.environ.get('POSTGRES_USER', default='dd'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', default='password'),
-        'HOST': os.environ.get('POSTGRES_HOST', default='localhost'),
+        'HOST': os.environ.get('POSTGRES_HOST', default='pgdb'),
         'PORT': os.environ.get('POSTGRES_PORT', default='5432'),
     }
 }
 
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://dd:password@localhost:5432/price_comparison'
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default='postgres://dd:password@localhost:5432/price_comparison'
+#     )
+# }
 
 CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
-
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -132,10 +115,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Kolkata'
@@ -144,18 +123,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = '/static/'
-
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static',
-# ]
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -163,8 +131,10 @@ LOGIN_URL = '/login_user/'
 LOGIN_REDIRECT_URL = '/search_view/'
 LOGOUT_REDIRECT_URL = '/login_user/'
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER', 'redis://localhost:6379/0')
+CELERY_BACKEND = os.environ.get('CELERY_BACKEND', 'redis://localhost:6379/0')
 # CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -172,16 +142,15 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_CACHE_BACKEND = 'django-cache'
 
 # Looking to send emails in production? Check out our Email API/SMTP product!
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '1db6586c46cc49'
-EMAIL_HOST_PASSWORD = '2588fb5c9e5940'
-EMAIL_PORT = '2525'
-DEFAULT_FROM_EMAIL='price-alerts@yourdomain.com'
+# EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+# EMAIL_HOST_USER = '1db6586c46cc49'
+# EMAIL_HOST_PASSWORD = '2588fb5c9e5940'
+# EMAIL_PORT = '2525'
+# DEFAULT_FROM_EMAIL='price-alerts@yourdomain.com'
 
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'dharmikd@zignuts.com'
-# EMAIL_HOST_PASSWORD = 'jjomilhptywlxryz'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'sandbox.smtp.mailtrap.io')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '1db6586c46cc49')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '2588fb5c9e5940')
+EMAIL_PORT = os.environ.get('EMAIL_PORT', '2525')
+DEFAULT_FROM_EMAIL=os.environ.get('DEFAULT_FROM_EMAIL', 'price-alerts@test.com')

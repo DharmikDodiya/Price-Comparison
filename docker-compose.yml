@@ -1,115 +1,125 @@
-# version: "3.9"
+# version: "3.8"
 
 # services:
-#   db:
-#     image: postgres:15
-#     volumes:
-#       - postgres_data:/var/lib/postgresql/data/
-#     environment:
-#       POSTGRES_DB: price_comparison
-#       POSTGRES_USER: dd
-#       POSTGRES_PASSWORD: password
+#     django:
+#       build: .
+#       container_name: django
+#       command: python manage.py runserver 0.0.0.0:8000
+#       volumes:
+#         - .:/app
+#       ports:
+#         - "8000:8000"
+#       environment:
+#         - DEBUG=1
+#         - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+#         - CELERY_BROKER=redis://redis:6379/0
+#         - CELERY_BACKEND=redis://redis:6379/0
+#         - DJANGO_SUPERUSER_USERNAME=admin
+#         - DJANGO_SUPERUSER_PASSWORD=admin123
+#         - DJANGO_SUPERUSER_EMAIL=admin@example.com
+#       depends_on: 
+#         - pgdb
+#         - redis
 
-#   redis:
-#     image: redis:7
-#     ports:
-#       - "6379:6379"
-
-#   web:
-#     build: .
-#     command: gunicorn price_comparison.wsgi:application --bind 0.0.0.0:8000
-#     volumes:
-#       - .:/app
-#     ports:
-#       - "8000:8000"
-#     depends_on:
-#       - db
-#       - redis
-#     environment:
-#       - DATABASE_URL=postgres://django_user:django_pass@db:5432/price_comparison
-#       - REDIS_URL=redis://redis:6379/0
-
-#   celery_worker:
-#     build: .
-#     command: celery -A price_comparison worker -l info
-#     volumes:
-#       - .:/app
-#     depends_on:
-#       - db
-#       - redis
-#     environment:
-#       - DATABASE_URL=postgres://django_user:django_pass@db:5432/price_comparison
-#       - REDIS_URL=redis://redis:6379/0
-
-#   celery_beat:
-#     build: .
-#     command: celery -A price_comparison beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-#     volumes:
-#       - .:/app
-#     depends_on:
-#       - db
-#       - redis
-#     environment:
-#       - DATABASE_URL=postgres://django_user:django_pass@db:5432/price_comparison
-#       - REDIS_URL=redis://redis:6379/0
-
+#     celery:
+#       build: .
+#       # command: celery worker --app=price_comparison --loglevel=info
+#       command: celery -A price_comparison worker -l info
+#       volumes:
+#         - ./:/app
+#       depends_on:
+#         - django
+#         - redis
+    
+#     pgdb:
+#       image: postgres
+#       container_name: pgdb
+#       environment:
+#         - POSTGRES_DB=price_comparison
+#         - POSTGRES_USER=dd
+#         - POSTGRES_PASSWORD=password
+#       ports:
+#         - "5432:5432"
+#       volumes:
+#         - pgdata:/var/lib/postgresql/data
+    
+#     redis:
+#       image: "redis:alpine"
 # volumes:
-#   postgres_data:
+#     pgdata:
 
-version: "3.9"
+    
+version: "3.8"
 
 services:
-  db:
-    image: postgres:15
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      POSTGRES_DB: price_comparison
-      POSTGRES_USER: dd
-      POSTGRES_PASSWORD: password
-
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-
-  web:
+  django:
     build: .
-    command: gunicorn price_comparison.wsgi:application --bind 0.0.0.0:8000
+    container_name: django
     volumes:
       - .:/app
     ports:
       - "8000:8000"
-    depends_on:
-      - db
-      - redis
     environment:
-      - DATABASE_URL=postgres://dd:password@db:5432/price_comparison
-      - REDIS_URL=redis://redis:6379/0
-
-  celery_worker:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - DJANGO_SUPERUSER_USERNAME=admin
+      - DJANGO_SUPERUSER_PASSWORD=admin123
+      - DJANGO_SUPERUSER_EMAIL=admin@example.com
+    depends_on:
+      - pgdb
+      - redis
+    command: >
+      sh -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      (echo 'from django.contrib.auth import get_user_model; 
+      User = get_user_model(); 
+      User.objects.filter(username=\"admin\").exists() or 
+      User.objects.create_superuser(username=\"admin\", email=\"admin@gmail.com\", password=\"admin123\")' | python manage.py shell) &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+      
+  celery:
     build: .
     command: celery -A price_comparison worker -l info
     volumes:
       - .:/app
     depends_on:
-      - db
+      - django
       - redis
-    environment:
-      - DATABASE_URL=postgres://dd:password@db:5432/price_comparison
-      - REDIS_URL=redis://redis:6379/0
 
   celery_beat:
     build: .
-    command: celery -A price_comparison beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: sh -c "
+      python manage.py migrate &&
+      celery -A price_comparison beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+      "
     volumes:
       - .:/app
     depends_on:
-      - db
+      - pgdb
       - redis
     environment:
-      - DATABASE_URL=postgres://dd:password@db:5432/price_comparison
-      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      
+  pgdb:
+    image: postgres
+    container_name: pgdb
+    environment:
+      - POSTGRES_DB=price_comparison
+      - POSTGRES_USER=dd
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    
+  redis:
+    image: "redis:alpine"
+    container_name: redis
 
 volumes:
-  postgres_data:
+  pgdata:

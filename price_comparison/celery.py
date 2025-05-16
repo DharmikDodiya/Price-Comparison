@@ -10,11 +10,11 @@ app = Celery('price_comparison')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 
-# Celery Beat schedule (every 10 seconds)
+# Celery Beat schedule (every 1 hours)
 app.conf.beat_schedule = {
     'check-price-drops-every-hour': {
         'task': 'priceapp.tasks.check_price_drops',
-        'schedule': crontab(minute=0),  # Run every hour at minute 0
+        'schedule': crontab(minute=0),
     },
 }
 

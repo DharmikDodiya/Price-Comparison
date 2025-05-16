@@ -7,7 +7,7 @@
 - User registration and login.
 - Scraping data from Amazon, Flipkart.
 
-**Installation Guide**
+# Installation Guide
 
 # Requirements
 
